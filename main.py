@@ -10,7 +10,7 @@ pyautogui.PAUSE = 0.1
 # 文件路径
 path3 = "chosen.png"
 path4 = "pause.png"
-
+path5 = "talking.png"
 coldInitFlag = False
 
 #各阶段停留时间，单位秒
@@ -39,7 +39,8 @@ def getFilteredTime(x, deltaTime = 5, xFilter = 1.0):
 def click():
     try:
         coords = pyautogui.locateOnScreen(path3, confidence=0.8)
-        if(coords != None):
+        coords2 = pyautogui.locateOnScreen(path5, confidence=0.8)
+        if(coords != None and coords2 != None):
             xy = pyautogui.center(coords)
             print("已找到对话选项")
             wait(getFilteredTime(waitTime_Talk))  # 等waitTime秒把话说完
