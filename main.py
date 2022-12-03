@@ -13,13 +13,13 @@ path4 = "pause.png"
 path5 = "talking.png"
 coldInitFlag = False
 
-#各阶段停留时间，单位秒
+# 各阶段停留时间，单位秒
 waitTime_Talk = 4.0
 waitTime_optionClick = 3.0
 waitTime_noDialogClick = 2.0
 waitTime_dialogClick = 1.0
 
-#点击时间混淆
+# 点击时间混淆
 timeFilter = 0.01
 
 # 自动点击的速度等级, 1最慢, 5最快
@@ -49,7 +49,6 @@ def click():
             print("已点击选项")
             return 1
         else:
-            print("未找到对话框")
             coords = pyautogui.locateOnScreen(path4, confidence=0.8)
             if(coords != None):
                 xy = pyautogui.center(coords)
@@ -58,6 +57,7 @@ def click():
                 pyautogui.click()
                 print("已点击对话框，加速对话")
                 return 2
+            print("未找到对话")
             return 0
     except:
         print("程序出错了")
