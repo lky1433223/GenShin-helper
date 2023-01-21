@@ -98,7 +98,7 @@ def click():
             if(coords != None):
                 xy = pyautogui.center(coords)
                 logPrint("已找到对话框")
-                pyautogui.moveTo(x=getFilteredTime(xy.x+750, 50, 100), y=getFilteredTime(xy.y+400, 10, 100), duration=getFilteredTime(0.2, 2))
+                pyautogui.moveTo(x=getFilteredTime(xy.x+450, 50, 100), y=getFilteredTime(xy.y+300, 10, 100), duration=getFilteredTime(0.2, 2))
                 pyautogui.click()
                 logPrint("已点击对话框，加速对话")
                 return 2
@@ -128,7 +128,7 @@ def creatCfgFile():
         file = open(".\\Genshin.cfg", "w+")
         file.write(f"#可配置5种点击速度档，1最慢，5最快,在Speed=后加数字即可配置\n")
         file.write("Speed=2\n")
-        file.write("log=1\n")
+        file.write("log=0\n")
         file.close()
     return coldInitFlag
 
