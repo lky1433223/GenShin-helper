@@ -7,6 +7,9 @@ import sys
 import threading
 import win32gui
 import win32con
+import win32api
+from pynput import keyboard
+from threading import Thread
 # 保护措施，避免失控
 pyautogui.FAILSAFE = True
 # 为所有的PyAutoGUI函数增加延迟。默认延迟时间是0.1秒。
@@ -36,6 +39,9 @@ logLevel = 0
 # 原神启动标志
 yuanshenRunning = False
 lock = threading.Lock()
+
+# 快捷键判断是否开启脚本
+enableFlag = False
 
 
 class timerThread(threading.Thread):
@@ -187,9 +193,12 @@ else:
 
 
 def main():
+    global enableFlag
+
     creatCfgFile()
     op = "OK"
     iniCfg()
+    on_activate()
     if (coldInitFlag):
         op = pyautogui.confirm(
             text=f'请将游戏分辨率调整为1600*900或以上，并打开剧情自动\n确认后将自动进行剧情对话点击\n本程序目录{os.getcwd()}下Genshin.cfg文件可配置点击速度\n默认速度等级:2',
@@ -199,12 +208,12 @@ def main():
                 'Cancel'])
     scanTimer = timerThread()
     scanTimer.start()
-    print("助手已启动")
+
     if (op == 'OK'):
         while (True):
             c = 0xFF
-            # 只有在原神启动时才进行对话检测
-            if (True == yuanshenRunning):
+            # 只有在原神启动且脚本激活时才进行对话检测
+            if (True == yuanshenRunning and enableFlag):
                 c = click()
             else:
                 time.sleep(2)
@@ -219,5 +228,71 @@ def main():
         pyautogui.alert(text='感谢您的使用，再见', title='原神剧情小助手', button='OK')
 
 
+'''
+CTRL = False
+VK_5 = False
+VK_53 = False
+def keyListen():  # 键盘监听函数
+    def on_press(key):
+        global enableFlag
+      #  print(key)
+        global CTRL, VK_5, VK_53
+        if key == keyboard.Key.ctrl or key == keyboard.Key.ctrl_l or key == keyboard.Key.ctrl_r:
+            CTRL = True
+        elif key == keyboard.KeyCode(char='5'):
+            VK_5 = True
+        elif key == keyboard.KeyCode(vk=53):
+            VK_53 = True
+
+        if (CTRL==True and VK_5==True) or (VK_53 == True):  # 检测到CTRL和5同时按下时，启动/关闭脚本
+            #CTRL = VK_5 = False5
+            enableFlag = not enableFlag
+            print(enableFlag, "success")
+
+    def on_release(key):
+       #print("onlistenRelease")
+        global CTRL, VK_5, VK_53
+        if key == keyboard.Key.ctrl or key == keyboard.Key.ctrl_l or key == keyboard.Key.ctrl_r:
+            CTRL = False
+        elif key == keyboard.KeyCode(char='5'):
+            VK_5 = False
+        elif key == keyboard.KeyCode(vk=53):
+            VK_53 = False
+        #print(enableFlag)
+
+    with keyboard.Listener(on_press=on_press, on_release=on_release) as listener:
+        listener.join()
+
+class ListenThread(Thread):  # 按键监听线程　
+    def __init__(self):
+        super().__init__()
+
+    def run(self):
+        keyListen()
+'''
+
+
+def on_activate():
+    global enableFlag
+    enableFlag = not enableFlag
+    if True == enableFlag:
+        print('助手状态: 已开启, 可按 Ctrl+Shift+9 关闭')
+    else:
+        print('助手状态: 已关闭, 可按 Ctrl+Shift+9 开启')
+
+
+def for_canonical(f):
+    return lambda k: f(l.canonical(k))
+
+
 if __name__ == '__main__':
-    main()
+    mThread = threading.Thread(target=main)
+    mThread.start()
+    hotkey = keyboard.HotKey(
+        keyboard.HotKey.parse('<ctrl>+<shift>+9'), on_activate)
+    with keyboard.Listener(
+        on_press=for_canonical(hotkey.press),
+        on_release=for_canonical(hotkey.release)
+    ) as l:
+        {l.join()}
+    mThread.join()
