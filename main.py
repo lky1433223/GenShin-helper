@@ -14,9 +14,9 @@ pyautogui.FAILSAFE = True
 # 为所有的PyAutoGUI函数增加延迟。默认延迟时间是0.1秒。
 pyautogui.PAUSE = 0.1
 # 文件路径
-path3 = "chosen.png"
-path4 = "pause.png"
-path5 = "talking.png"
+path3 = "assets/chosen.png"
+path4 = "assets/chosen.png"
+path5 = "assets/chosen.png"
 coldInitFlag = False
 
 # 各阶段停留时间，单位秒
