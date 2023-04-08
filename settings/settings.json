@@ -1,0 +1,7 @@
+{
+  "chosen_path" : "assets/chosen.bmp",
+  "wait_after_find": 5,
+  "wait_after_clicked": 3,
+  "wait_not_find": 2,
+  "skip": 0
+}

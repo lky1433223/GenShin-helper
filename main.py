@@ -1,54 +1,70 @@
+import json
+import random
+
 import pyautogui
 import time
 import sys
 import ctypes
+import logging
+import json
+
+# 加载对话设置
+with open("settings/text.json", encoding="utf-8") as f:
+    text = json.load(f)
+    f.close()
+text_windows = text["window"]
+text_dialogue = text["dialogue"]
+# 初始化设置
+with open("settings/settings.json", encoding="utf-8") as f:
+    settings = json.load(f)
+    f.close()
+# chosen图片的路径
+path_chosen = settings["chosen_path"]
 
 # 保护措施，避免失控
 pyautogui.FAILSAFE = True
 # 为所有的PyAutoGUI函数增加延迟。默认延迟时间是0.1秒。
 pyautogui.PAUSE = 0.1
-# 文件路径
-path3 = "assets/chosen.bmp"
 
 
 def wait(x):
     print("等待 " + str(x) + "s")
-    for i in range(0, x):
-        print(i + 1)
+    for i in range(x):
+        print(i + 1, end='...\n')
         time.sleep(1)
 
 
-def click():
+def click() -> bool:
+    """
+    寻找对话图标并进行点击
+    :return: true:找到并点击 false：未找到
+    """
     try:
-        coords = pyautogui.locateOnScreen(path3, confidence=0.6)
+        coords = pyautogui.locateOnScreen(path_chosen, confidence=0.8)  # 寻找图片 confidence是模糊值
         if coords is not None:
-            xy = pyautogui.center(coords)
-            print("已找到对话框")
-            wait(5)  # 等5秒把话说完
-            pyautogui.moveTo(x=xy.x, y=xy.y, duration=0.2)
+            xy = pyautogui.center(coords)  # 图像坐标
+            print(text_dialogue["find"])
+            wait(settings["wait_after_find"])  # 等5秒把话说完
+            pyautogui.moveTo(x=xy.x, y=xy.y, duration=0.1 + random.random() / 3)  # 随机在0.1-0.4移动鼠标混淆
             pyautogui.click()
-            print("已点击")
+            print(text_dialogue["clicked"])
             return True
         else:
-            print("未找到对话框")
+            print(text_dialogue["not find"])
             return False
-    except:
-        print("程序出错了")
+    except Exception as err:
+        print(text_dialogue["error"], err)
+        raise err
 
 
 def main():
-    op = pyautogui.confirm(text='请将窗口调整为1600*900，打开剧情自动\n确   认后将自动进行剧情对话点击',
-                           title='原神剧情小助手', buttons=['OK', 'Cancel'])
+    op = pyautogui.confirm(text=text_windows["prompt"], title=text_windows["title"], buttons=['OK', 'Cancel'])
     if op == 'OK':
         while True:
-            c = click()
-            # 点到对话之后3秒
-            if c:
-                wait(3)
-            else:
-                wait(2)
+            clicked = click()
+            wait(settings["wait_after_clicked"]) if clicked else wait(settings["wait_not_find"])  # 点到之后对话/没有点到对话
     else:
-        pyautogui.alert(text='感谢您的使用，再见', title='原神剧情小助手', button='OK')
+        pyautogui.alert(text=text_windows["thank"], title=text_windows["title"], button='OK')
 
 
 def is_admin():
@@ -60,6 +76,9 @@ def is_admin():
 
 
 if __name__ == '__main__':
+    # TODO:优化使用体验,跳过对话等功能
+    # TODO:剧情自动
+    # logger
     if not is_admin():
         if sys.version_info[0] == 3:
             ctypes.windll.shell32.ShellExecuteW(
