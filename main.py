@@ -1,11 +1,8 @@
-import json
 import random
-
 import pyautogui
 import time
 import sys
 import ctypes
-import logging
 import json
 
 # 加载对话设置
@@ -81,7 +78,6 @@ if __name__ == '__main__':
     # logger
     if not is_admin():
         if sys.version_info[0] == 3:
-            ctypes.windll.shell32.ShellExecuteW(
-                None, "runas", sys.executable, __file__, None, 1)
+            ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, __file__, None, 1)
             sys.exit(0)
     main()
